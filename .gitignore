@@ -22,6 +22,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local Salesforce metadata
+/.sf/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
