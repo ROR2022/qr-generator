@@ -1,0 +1,118 @@
+metadata:
+  generated: "2026-11-19"
+  source_plan: "whatsapp-share-plan.md"
+  target_tasks: "Tasks embedded in whatsapp-share-plan.md"
+
+summary:
+  total_plan_items: 7
+  covered_plan_items: 7
+  missing_plan_items: 0
+  coverage_percentage: 100.0
+  total_tasks_generated: 13
+  orphan_tasks: 0
+
+phases:
+  - phase_id: "Phase-1"
+    phase_name: "Fundamentos"
+    items:
+      - item_id: "1.1"
+        description: "Common HTTP(S) payload validation."
+        tasks:
+          - task_id: "T001"
+            description: "Extract reusable HTTP(S) URL helper and retain PDF behavior."
+        notes: ""
+  - phase_id: "Phase-2"
+    phase_name: "Compartición"
+    items:
+      - item_id: "2.1"
+        description: "Prepare PNG and invoke native file-and-text sharing with fallback classification."
+        tasks:
+          - task_id: "T002"
+            description: "Build message text for URL and non-URL content."
+          - task_id: "T003"
+            description: "Create PNG File and message text."
+          - task_id: "T004"
+            description: "Detect Web Share support and distinguish completed, cancelled, and fallback outcomes."
+        notes: ""
+      - item_id: "2.2"
+        description: "Build safe WhatsApp prefilled-text fallback URL."
+        tasks:
+          - task_id: "T005"
+            description: "Encode message for wa.me without attaching or promising an image."
+        notes: ""
+  - phase_id: "Phase-3"
+    phase_name: "Integración de interfaz"
+    items:
+      - item_id: "3.1"
+        description: "Accessible share action and operation states."
+        tasks:
+          - task_id: "T006"
+            description: "Add share button, busy guard, and error reporting."
+          - task_id: "T009"
+            description: "Keep format buttons legible and share action keyboard accessible."
+        notes: ""
+      - item_id: "3.2"
+        description: "Manual fallback controls."
+        tasks:
+          - task_id: "T007"
+            description: "Provide PNG, copy URL, and wa.me controls."
+        notes: ""
+      - item_id: "3.3"
+        description: "Hide actions from the scaled mobile thumbnail."
+        tasks:
+          - task_id: "T008"
+            description: "Add action visibility prop and disable controls in mobile thumbnail."
+        notes: ""
+  - phase_id: "Phase-4"
+    phase_name: "Validación"
+    items:
+      - item_id: "4.1"
+        description: "Type/build, URL cases, API outcomes, platform behavior, and regressions."
+        tasks:
+          - task_id: "T010"
+            description: "Run TypeScript check and production build."
+          - task_id: "T011"
+            description: "Verify URLs and message generation for each content type."
+          - task_id: "T012"
+            description: "Exercise support, cancellation, failure, and clipboard cases."
+          - task_id: "T013"
+            description: "Manually test WhatsApp on Android/iOS and fallback on desktop."
+        notes: ""
+
+missing_plan_items: []
+orphan_tasks: []
+upstream_trace:
+  - plan_item: "1.1"
+    source_requirements: ["REQ-WA-002", "REQ-WA-003", "REQ-WA-008"]
+    tasks: ["T001"]
+    full_trace: "REQ-WA-002, REQ-WA-003 → Phase-1.1 → T001"
+  - plan_item: "2.1"
+    source_requirements: ["REQ-WA-001", "REQ-WA-002", "REQ-WA-003", "REQ-WA-004", "REQ-WA-005", "REQ-WA-008"]
+    tasks: ["T002", "T003", "T004"]
+    full_trace: "REQ-WA-001, REQ-WA-004, REQ-WA-005 → Phase-2.1 → T002,T003,T004"
+  - plan_item: "2.2"
+    source_requirements: ["REQ-WA-004"]
+    tasks: ["T005"]
+    full_trace: "REQ-WA-004 → Phase-2.2 → T005"
+  - plan_item: "3.1"
+    source_requirements: ["REQ-WA-001", "REQ-WA-005", "REQ-WA-006", "REQ-WA-007"]
+    tasks: ["T006", "T009"]
+    full_trace: "REQ-WA-001, REQ-WA-006 → Phase-3.1 → T006,T009"
+  - plan_item: "3.2"
+    source_requirements: ["REQ-WA-004"]
+    tasks: ["T007"]
+    full_trace: "REQ-WA-004 → Phase-3.2 → T007"
+  - plan_item: "3.3"
+    source_requirements: ["REQ-WA-007"]
+    tasks: ["T008"]
+    full_trace: "REQ-WA-007 → Phase-3.3 → T008"
+  - plan_item: "4.1"
+    source_requirements: ["REQ-WA-001", "REQ-WA-002", "REQ-WA-003", "REQ-WA-004", "REQ-WA-005", "REQ-WA-006", "REQ-WA-007", "REQ-WA-008"]
+    tasks: ["T010", "T011", "T012", "T013"]
+    full_trace: "REQ-WA-001..008 → Phase-4.1 → T010,T011,T012,T013"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "The proposal requires real-device testing because Web Share target behavior is platform-dependent."

@@ -1,0 +1,17 @@
+checkpoint: spec-to-plan
+status: pass
+spec_source: "Solicitud del usuario en esta conversación"
+requirements:
+  - id: REQ-001
+    description: "Permitir descargar el QR como PDF además de PNG, SVG y JPG."
+    plan_items: ["2.1", "2.2", "2.3"]
+  - id: REQ-002
+    description: "Hacer clic sobre el QR del PDF para abrir una URL HTTP(S) válida."
+    plan_items: ["1.2", "1.3", "2.2", "2.3"]
+  - id: REQ-003
+    description: "El destino clicable debe coincidir con el payload URL; otros tipos no reciben enlace web."
+    plan_items: ["1.3", "2.3"]
+  - id: REQ-004
+    description: "Conservar generación local, personalización y descargas actuales."
+    plan_items: ["1.2", "2.2", "2.4", "3.1", "3.2"]
+unresolved: []

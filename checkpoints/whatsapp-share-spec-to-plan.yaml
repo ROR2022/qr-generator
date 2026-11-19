@@ -1,0 +1,111 @@
+metadata:
+  generated: "2026-11-19"
+  source_spec: "Aprobación de la propuesta de compartir QR + enlace por WhatsApp en la conversación"
+  target_plan: "whatsapp-share-plan.md"
+
+summary:
+  total_requirements: 8
+  covered_requirements: 8
+  missing_requirements: 0
+  coverage_percentage: 100.0
+
+requirements:
+  - req_id: "REQ-WA-001"
+    req_description: "Compartir la imagen PNG del QR usando el menú nativo cuando esté disponible."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2, Phase-3"
+      phase_name: "Compartición e integración de interfaz"
+      items:
+        - item_id: "2.1"
+          description: "Preparar archivo y compartir mediante Web Share API."
+        - item_id: "3.1"
+          description: "Añadir acción Compartir y estados a la vista previa."
+  - req_id: "REQ-WA-002"
+    req_description: "Incluir URL HTTP(S) normalizada del payload en el texto."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1, Phase-2"
+      phase_name: "Fundamentos y compartición"
+      items:
+        - item_id: "1.1"
+          description: "Extraer validación HTTP(S) común."
+        - item_id: "2.1"
+          description: "Crear texto y compartirlo junto con el archivo."
+  - req_id: "REQ-WA-003"
+    req_description: "No añadir un enlace web para tipos no URL."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1, Phase-2"
+      phase_name: "Fundamentos y compartición"
+      items:
+        - item_id: "1.1"
+          description: "Validar URL solo para contenido URL."
+        - item_id: "2.1"
+          description: "Construir texto diferenciado por tipo de contenido."
+  - req_id: "REQ-WA-004"
+    req_description: "Presentar fallback manual si compartir archivo no está disponible o falla."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2, Phase-3"
+      phase_name: "Compartición e integración de interfaz"
+      items:
+        - item_id: "2.1"
+          description: "Detectar soporte y clasificar resultado."
+        - item_id: "2.2"
+          description: "Construir URL de fallback wa.me."
+        - item_id: "3.2"
+          description: "Presentar acciones manuales accesibles."
+  - req_id: "REQ-WA-005"
+    req_description: "Tratar la cancelación sin error ni falso éxito."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-2, Phase-3"
+      phase_name: "Compartición e integración de interfaz"
+      items:
+        - item_id: "2.1"
+          description: "Distinguir cancelación del usuario de errores."
+        - item_id: "3.1"
+          description: "Reflejar los estados correctos en la UI."
+  - req_id: "REQ-WA-006"
+    req_description: "Bloquear compartir hasta que el QR esté listo y evitar operaciones concurrentes."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3"
+      phase_name: "Integración de interfaz"
+      items:
+        - item_id: "3.1"
+          description: "Usar estado de disponibilidad y estado busy."
+  - req_id: "REQ-WA-007"
+    req_description: "Mantener la acción en vistas completas, ocultarla en miniatura y preservar formatos existentes."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-3, Phase-4"
+      phase_name: "Integración y validación"
+      items:
+        - item_id: "3.1"
+          description: "Agregar UI de compartir."
+        - item_id: "3.3"
+          description: "Excluir controles de la miniatura móvil."
+        - item_id: "4.1"
+          description: "Verificar regresión de formatos."
+  - req_id: "REQ-WA-008"
+    req_description: "Preparar el QR y el texto localmente sin backend."
+    priority: "P1"
+    plan_mapping:
+      phase: "Phase-1, Phase-2, Phase-4"
+      phase_name: "Fundamentos, compartición y validación"
+      items:
+        - item_id: "1.1"
+          description: "Construir texto desde el payload ya generado."
+        - item_id: "2.1"
+          description: "Preparar archivo en cliente."
+        - item_id: "4.1"
+          description: "Verificar ausencia de carga externa."
+
+missing_requirements: []
+orphan_plan_items: []
+validation:
+  passed: true
+  errors: []
+  warnings: []

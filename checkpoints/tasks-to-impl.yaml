@@ -1,0 +1,281 @@
+metadata:
+  generated: "2026-11-18"
+  source_tasks: "plan.md"
+  last_updated: "2026-11-18"
+
+summary:
+  total_tasks: 10
+  completed_tasks: 10
+  in_progress_tasks: 0
+  pending_tasks: 0
+  completion_percentage: 100.0
+
+tasks:
+  - task_id: "T001"
+    description: "Calculate compact PDF page dimensions based on QR size and margin."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "lib/pdf-export.ts"
+          changes:
+            - change_type: "added"
+              description: "Sets page size from QR dimensions at 96 dpi plus an 8 pt margin."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Node runtime check of generated PDF MediaBox"
+        passed: 1
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "280 px QR produced a 226 x 226 pt page."
+    upstream_trace:
+      plan_item: "1.1"
+      requirements: ["REQ-001", "REQ-004"]
+      full_trace: "REQ-004 → Plan 1.1 → T001 → lib/pdf-export.ts"
+  - task_id: "T002"
+    description: "Reuse PNG output from the current QRCodeStyling instance."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "lib/pdf-export.ts"
+          changes:
+            - change_type: "added"
+              description: "Uses getRawData('png') to embed the configured QR in the PDF."
+    verification:
+      build_passed: true
+      test_results:
+        command: "pnpm exec tsc --noEmit && pnpm build"
+        passed: 2
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "The current QR instance is reused; no QR options are duplicated."
+    upstream_trace:
+      plan_item: "1.2"
+      requirements: ["REQ-004"]
+      full_trace: "REQ-004 → Plan 1.2 → T002 → lib/pdf-export.ts"
+  - task_id: "T003"
+    description: "Validate a clickable destination from the normalized payload."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "lib/pdf-export.ts"
+          changes:
+            - change_type: "added"
+              description: "Adds a PDF link only for URL content with a valid HTTP(S) scheme."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Node runtime checks for valid and invalid URL destinations"
+        passed: 2
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Non-URL content and malformed URL payloads produced no URI annotation."
+    upstream_trace:
+      plan_item: "1.3"
+      requirements: ["REQ-002", "REQ-003"]
+      full_trace: "REQ-003 → Plan 1.3 → T003 → lib/pdf-export.ts"
+  - task_id: "T004"
+    description: "Add jsPDF dependency and update lockfile."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "package.json"
+          changes:
+            - change_type: "modified"
+              description: "Adds jsPDF as a production dependency."
+        - file: "pnpm-lock.yaml"
+          changes:
+            - change_type: "modified"
+              description: "Records jsPDF and its resolved dependencies."
+    verification:
+      build_passed: true
+      test_results:
+        command: "pnpm build"
+        passed: 1
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "pnpm reported its configured ignored-build-script policy during add; the production build passed."
+    upstream_trace:
+      plan_item: "2.1"
+      requirements: ["REQ-001"]
+      full_trace: "REQ-001 → Plan 2.1 → T004 → package.json and pnpm-lock.yaml"
+  - task_id: "T005"
+    description: "Generate a one-page compact PDF with the current QR."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "lib/pdf-export.ts"
+          changes:
+            - change_type: "added"
+              description: "Builds a PDF from the configured QR PNG with a small white margin."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Node runtime PDF generation check"
+        passed: 1
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "PDF signature and calculated page dimensions verified."
+    upstream_trace:
+      plan_item: "2.2"
+      requirements: ["REQ-001", "REQ-004"]
+      full_trace: "REQ-001 → Plan 2.2 → T005 → lib/pdf-export.ts"
+  - task_id: "T006"
+    description: "Add a link annotation only for a valid HTTP(S) URL payload."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "lib/pdf-export.ts"
+          changes:
+            - change_type: "added"
+              description: "Makes the QR image area clickable for valid URL payloads."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Node runtime PDF annotation checks"
+        passed: 3
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Verified exact URL annotation and no annotation for non-URL or invalid URL content."
+    upstream_trace:
+      plan_item: "2.3"
+      requirements: ["REQ-002", "REQ-003"]
+      full_trace: "REQ-002 → Plan 2.3 → T006 → lib/pdf-export.ts"
+  - task_id: "T007"
+    description: "Add the PDF download action and UI feedback."
+    status: "completed"
+    implementation:
+      files_changed:
+        - file: "components/QRPreview.tsx"
+          changes:
+            - change_type: "modified"
+              description: "Adds accessible PDF action, progress state, and visible error feedback."
+        - file: "app/layout.tsx"
+          changes:
+            - change_type: "modified"
+              description: "Includes PDF among the advertised export formats."
+        - file: "README.md"
+          changes:
+            - change_type: "modified"
+              description: "Documents PDF export and clickable URL QR behavior."
+    verification:
+      build_passed: true
+      test_results:
+        command: "Browser smoke check"
+        passed: 1
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Verified button appears and enters generation state in the preview dialog."
+    upstream_trace:
+      plan_item: "2.4"
+      requirements: ["REQ-001", "REQ-004"]
+      full_trace: "REQ-001 → Plan 2.4 → T007 → components/QRPreview.tsx"
+  - task_id: "T008"
+    description: "Run TypeScript check and production build."
+    status: "completed"
+    implementation:
+      files_changed: []
+    verification:
+      build_passed: true
+      test_results:
+        command: "pnpm exec tsc --noEmit && pnpm build"
+        passed: 2
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Both checks completed successfully."
+    upstream_trace:
+      plan_item: "3.1"
+      requirements: ["REQ-001", "REQ-004"]
+      full_trace: "REQ-004 → Plan 3.1 → T008 → TypeScript and Next.js build"
+  - task_id: "T009"
+    description: "Verify valid URL, invalid URL, and non-URL PDF behavior."
+    status: "completed"
+    implementation:
+      files_changed: []
+    verification:
+      build_passed: true
+      test_results:
+        command: "Node runtime checks against generated PDF bytes"
+        passed: 3
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Checked PDF signature, compact MediaBox, and URI annotations."
+    upstream_trace:
+      plan_item: "3.2"
+      requirements: ["REQ-001", "REQ-002", "REQ-003"]
+      full_trace: "REQ-002 → Plan 3.2 → T009 → generated PDF bytes"
+  - task_id: "T010"
+    description: "Check export controls and regression availability in the browser."
+    status: "completed"
+    implementation:
+      files_changed: []
+    verification:
+      build_passed: true
+      test_results:
+        command: "Browser smoke check"
+        passed: 1
+        failed: 0
+        skipped: 0
+        failures: []
+      notes: "Existing PNG, SVG, and JPG controls remained visible; automated browser did not expose a downloadable file for direct inspection."
+    upstream_trace:
+      plan_item: "3.2"
+      requirements: ["REQ-001", "REQ-004"]
+      full_trace: "REQ-004 → Plan 3.2 → T010 → components/QRPreview.tsx"
+
+pending_tasks: []
+untracked_changes: []
+traceability_chain:
+  - chain_id: "TRACE-001"
+    requirement: "REQ-001"
+    plan_phase: "Phase 2"
+    plan_item: "2.2"
+    tasks: ["T004", "T005", "T007"]
+    files:
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "lib/pdf-export.ts"
+      - "components/QRPreview.tsx"
+    status: "complete"
+  - chain_id: "TRACE-002"
+    requirement: "REQ-002"
+    plan_phase: "Phase 2"
+    plan_item: "2.3"
+    tasks: ["T003", "T006"]
+    files:
+      - "lib/pdf-export.ts"
+    status: "complete"
+  - chain_id: "TRACE-003"
+    requirement: "REQ-003"
+    plan_phase: "Phase 2"
+    plan_item: "2.3"
+    tasks: ["T003", "T006", "T009"]
+    files:
+      - "lib/pdf-export.ts"
+    status: "complete"
+  - chain_id: "TRACE-004"
+    requirement: "REQ-004"
+    plan_phase: "Phase 2"
+    plan_item: "2.4"
+    tasks: ["T002", "T007", "T008", "T010"]
+    files:
+      - "components/QRPreview.tsx"
+      - "lib/pdf-export.ts"
+    status: "complete"
+
+validation:
+  passed: true
+  errors: []
+  warnings:
+    - "The browser validation harness did not expose a file download event; generated PDF structure was verified in a local runtime check."
+    - "pnpm add reported ignored build scripts under the configured policy; TypeScript check and production build passed."
+  blocking_issues: []

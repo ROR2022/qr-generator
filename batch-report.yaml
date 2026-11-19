@@ -1,0 +1,100 @@
+batch_id: "B01"
+completed_tasks: ["T001", "T002", "T003", "T004", "T005", "T006", "T007", "T008", "T009", "T010"]
+blocked_tasks: []
+files_changed:
+  T001:
+    - file: "lib/pdf-export.ts"
+      change_type: "created"
+      description: "Calculates a compact page size from QR dimensions and margin."
+  T002:
+    - file: "lib/pdf-export.ts"
+      change_type: "created"
+      description: "Reuses the current QRCodeStyling PNG output."
+  T003:
+    - file: "lib/pdf-export.ts"
+      change_type: "created"
+      description: "Validates HTTP(S) link targets from the built QR payload."
+  T004:
+    - file: "package.json"
+      change_type: "modified"
+      description: "Adds jsPDF."
+    - file: "pnpm-lock.yaml"
+      change_type: "modified"
+      description: "Updates dependency lock."
+  T005:
+    - file: "lib/pdf-export.ts"
+      change_type: "created"
+      description: "Generates a compact one-page PDF with the current QR."
+  T006:
+    - file: "lib/pdf-export.ts"
+      change_type: "created"
+      description: "Adds a clickable annotation only for valid HTTP(S) URL payloads."
+  T007:
+    - file: "components/QRPreview.tsx"
+      change_type: "modified"
+      description: "Adds PDF download control, busy state, and visible error feedback."
+    - file: "app/layout.tsx"
+      change_type: "modified"
+      description: "Includes PDF in page metadata."
+    - file: "README.md"
+      change_type: "modified"
+      description: "Documents PDF download and clickable URL behavior."
+evidence_mapping:
+  T003:
+    - upstream: "plan.md#REQ-003"
+      output: "lib/pdf-export.ts#getClickableUrl"
+      evidence: "Runtime PDF check confirms non-URL and invalid URLs have no URI annotation."
+  T006:
+    - upstream: "plan.md#REQ-002"
+      output: "lib/pdf-export.ts#downloadQrPdf"
+      evidence: "Runtime PDF check confirms valid URL annotation."
+traceability:
+  - requirement: "REQ-001"
+    plan_item: "2.2"
+    task: "T004"
+    files: ["package.json", "pnpm-lock.yaml"]
+    status: "completed"
+  - requirement: "REQ-001"
+    plan_item: "2.2"
+    task: "T005"
+    files: ["lib/pdf-export.ts"]
+    status: "completed"
+  - requirement: "REQ-002"
+    plan_item: "2.3"
+    task: "T006"
+    files: ["lib/pdf-export.ts"]
+    status: "completed"
+  - requirement: "REQ-003"
+    plan_item: "1.3"
+    task: "T003"
+    files: ["lib/pdf-export.ts"]
+    status: "completed"
+  - requirement: "REQ-004"
+    plan_item: "2.4"
+    task: "T007"
+    files: ["components/QRPreview.tsx", "app/layout.tsx", "README.md"]
+    status: "completed"
+protocol_violation: false
+errors: []
+warnings:
+  - "The browser validation harness did not expose a file download event; generated PDF structure was verified in a local runtime check."
+  - "pnpm add reported ignored build scripts under the configured policy; TypeScript check and production build passed."
+test_results:
+  typecheck:
+    command: "pnpm exec tsc --noEmit"
+    passed: 1
+    failed: 0
+    skipped: 0
+    failures: []
+  build:
+    command: "pnpm build"
+    passed: 1
+    failed: 0
+    skipped: 0
+    failures: []
+  runtime_pdf:
+    command: "Node runtime checks for valid URL, non-URL, and invalid URL payloads"
+    passed: 3
+    failed: 0
+    skipped: 0
+    failures: []
