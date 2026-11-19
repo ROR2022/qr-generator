@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react'
 import QRCodeStyling from 'qr-code-styling'
 import { Share2 } from 'lucide-react'
+import { getTranslations, type Language } from '@/lib/i18n'
 import type { QRConfig } from '@/lib/qr-config'
 import { buildPayload, getHttpUrl } from '@/lib/payload'
 import { normalizeDownloadName } from '@/lib/download-name'
@@ -9,6 +10,7 @@ import { downloadQrPdf } from '@/lib/pdf-export'
 import { getShareText, getWhatsAppShareUrl, shareQr } from '@/lib/share'
 
 type QRPreviewProps = {
+  language: Language
   config: QRConfig
   downloadName: string
   onDownloadNameChange: (name: string) => void
@@ -18,7 +20,8 @@ type QRPreviewProps = {
 
 const actionClass = 'rounded-xl border border-zinc-200 bg-white px-2 py-3 text-xs font-semibold text-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-indigo-950'
 
-export default function QRPreview({ config, downloadName, onDownloadNameChange, onReady, showActions = true }: QRPreviewProps) {
+export default function QRPreview({ language, config, downloadName, onDownloadNameChange, onReady, showActions = true }: QRPreviewProps) {
+  const t = getTranslations(language)
   const host = useRef<HTMLDivElement>(null)
   const qr = useRef<QRCodeStyling | null>(null)
   const copyField = useRef<HTMLTextAreaElement>(null)
@@ -36,7 +39,7 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
   const payloadReady = Boolean(payload?.trim())
   const normalizedDownloadName = normalizeDownloadName(downloadName)
   const httpUrl = getHttpUrl(config)
-  const shareText = getShareText(config)
+  const shareText = getShareText(config, language)
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>
@@ -102,7 +105,7 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
       await downloadQrPdf(qr.current, config, normalizedDownloadName)
     } catch (error) {
       console.error('Unable to generate QR PDF', error)
-      setPdfError('No se pudo generar el PDF. Inténtalo de nuevo.')
+      setPdfError(t.preview.pdfError)
     } finally {
       setPdfBusy(false)
     }
@@ -116,19 +119,19 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
     setCopyStatus(null)
     setShowCopyField(false)
     try {
-      const result = await shareQr(qr.current, config, normalizedDownloadName)
+      const result = await shareQr(qr.current, config, normalizedDownloadName, language)
       if (result === 'fallback') {
         setManualOptionsOpen(true)
-        setShareStatus('Este navegador no puede compartir el archivo directamente. Usa las opciones manuales.')
+        setShareStatus(t.preview.shareFallback)
       } else {
-        setShareStatus('El flujo de compartir se cerró. El navegador no confirma que se haya enviado.')
+        setShareStatus(t.preview.shareClosed)
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        setShareStatus('Se canceló el menú para compartir. Puedes usar las opciones manuales.')
+        setShareStatus(t.preview.shareCancelled)
       } else {
         console.error('Unable to share QR', error)
-        setShareError('No se pudo preparar o compartir el QR. Puedes usar las opciones manuales.')
+        setShareError(t.preview.shareError)
         setManualOptionsOpen(true)
       }
     } finally {
@@ -143,10 +146,10 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard API is unavailable.')
       await navigator.clipboard.writeText(httpUrl)
-      setCopyStatus('Enlace copiado.')
+      setCopyStatus(t.preview.copied)
     } catch (error) {
       console.error('Unable to copy QR destination URL', error)
-      setCopyStatus('No se pudo copiar automáticamente. Selecciona y copia el enlace:')
+      setCopyStatus(t.preview.copyFailed)
       setShowCopyField(true)
       setManualOptionsOpen(true)
       requestAnimationFrame(() => {
@@ -169,14 +172,14 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
         />
       </div>
       <p className="mt-4 text-center text-xs text-zinc-400">
-        {ready ? 'Vista previa actualizada al instante' : 'Preparando tu código QR…'}
+        {ready ? t.preview.updated : t.preview.preparing}
       </p>
 
       {showActions && (
         <>
           <div className="mt-5">
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">Nombre del archivo</span>
+              <span className="mb-1.5 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">{t.preview.fileName}</span>
               <input
                 type="text"
                 maxLength={100}
@@ -187,7 +190,7 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
               />
             </label>
             <p className="mt-1 text-[11px] text-zinc-400">
-              Ejemplo: <code>{normalizedDownloadName}.png</code>. La extensión se agrega según el formato; si lo dejas vacío, se usa qr-studio.
+              {t.preview.fileHelp(normalizedDownloadName)}
             </p>
           </div>
           <div className="mt-5 grid grid-cols-4 gap-2">
@@ -199,19 +202,19 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
                 onClick={() => download(format)}
                 className={actionClass}
               >
-                <span className="block text-[10px] font-normal normal-case text-zinc-400">Descargar</span>
+                <span className="block text-[10px] font-normal normal-case text-zinc-400">{t.preview.download}</span>
                 {format === 'jpeg' ? 'JPG' : format}
               </button>
             ))}
             <button
               type="button"
-              aria-label="Descargar QR en PDF"
+              aria-label={t.preview.downloadPdf}
               disabled={!ready || pdfBusy || shareBusy}
               onClick={() => void downloadPdf()}
               className={actionClass}
             >
               <span className="block text-[10px] font-normal normal-case text-zinc-400">
-                {pdfBusy ? 'Generando…' : 'Descargar'}
+                {pdfBusy ? t.preview.generating : t.preview.download}
               </span>
               PDF
             </button>
@@ -227,11 +230,11 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
             className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40 dark:focus-visible:ring-offset-zinc-950"
           >
             <Share2 size={17} aria-hidden="true" />
-            {shareBusy ? 'Preparando…' : 'Compartir'}
+            {shareBusy ? t.preview.sharing : t.preview.share}
           </button>
-          <p className="mt-1 text-center text-xs text-zinc-400">Elige WhatsApp para enviar el QR y el texto.</p>
+          <p className="mt-1 text-center text-xs text-zinc-400">{t.preview.shareHint}</p>
 
-          {shareStatus && <p role="status" className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-400">{shareStatus}</p>}
+          {shareStatus &&           <p role="status" className="mt-2 text-center text-xs text-zinc-500 dark:text-zinc-400">{shareStatus}</p>}
           {shareError && <p role="alert" className="mt-2 text-center text-xs text-rose-600 dark:text-rose-400">{shareError}</p>}
 
           <div className="mt-3">
@@ -241,12 +244,12 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
               onClick={() => setManualOptionsOpen((open) => !open)}
               className="w-full rounded-lg px-3 py-2 text-sm font-medium text-indigo-700 underline decoration-indigo-300 underline-offset-4 hover:text-indigo-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200"
             >
-              {manualOptionsOpen ? 'Ocultar opciones manuales' : 'Opciones para compartir manualmente'}
+              {manualOptionsOpen ? t.preview.manualHide : t.preview.manualShow}
             </button>
 
             {manualOptionsOpen && (
               <div className="mt-2 space-y-3 rounded-xl border border-zinc-200 bg-white p-4 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-                <p>Descarga el PNG y adjúntalo en WhatsApp. El texto se prepara al abrir WhatsApp; el archivo debes adjuntarlo manualmente.</p>
+                <p>{t.preview.manualInfo}</p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
@@ -254,7 +257,7 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
                     onClick={() => download('png')}
                     className="rounded-lg border border-zinc-200 px-3 py-2 font-medium hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40 dark:border-zinc-700 dark:hover:bg-zinc-800"
                   >
-                    Descargar PNG
+                    {t.preview.downloadPng}
                   </button>
                   {httpUrl && (
                     <button
@@ -262,23 +265,23 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
                       onClick={() => void copyLink()}
                       className="rounded-lg border border-zinc-200 px-3 py-2 font-medium hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-zinc-700 dark:hover:bg-zinc-800"
                     >
-                      Copiar enlace
+                      {t.preview.copyLink}
                     </button>
                   )}
                   <a
-                    href={getWhatsAppShareUrl(config)}
+                    href={getWhatsAppShareUrl(config, language)}
                     target="_blank"
                     rel="noreferrer"
                     className="rounded-lg bg-emerald-600 px-3 py-2 font-semibold text-white hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
                   >
-                    Abrir WhatsApp con el texto
+                    {t.preview.openWhatsApp}
                   </a>
                 </div>
                 {copyStatus && <p role={showCopyField ? 'alert' : 'status'}>{copyStatus}</p>}
                 {showCopyField && httpUrl && (
                   <textarea
                     ref={copyField}
-                    aria-label="Enlace del QR para copiar manualmente"
+                    aria-label={t.preview.copyField}
                     readOnly
                     value={httpUrl}
                     onFocus={(event) => event.currentTarget.select()}
@@ -286,7 +289,7 @@ export default function QRPreview({ config, downloadName, onDownloadNameChange, 
                     rows={2}
                   />
                 )}
-                <p className="break-all text-xs text-zinc-400">Texto sugerido: {shareText}</p>
+                <p className="break-all text-xs text-zinc-400">{t.preview.suggested}: {shareText}</p>
               </div>
             )}
           </div>

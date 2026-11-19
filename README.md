@@ -2,7 +2,7 @@
 
 Generador de códigos QR personalizables con Next.js App Router, TypeScript, Tailwind CSS y [qr-code-styling](https://github.com/kozakdenys/qr-code-styling). El QR se genera localmente en el navegador; no requiere cuenta, API keys ni backend.
 
-Descarga el QR en PNG, SVG, JPG o PDF y define el nombre base del archivo; la extensión se agrega según el formato. En los PDF, el QR de tipo URL también funciona como enlace clicable al destino. Comparte el PNG con el menú del dispositivo y un texto que incluya el enlace cuando el QR sea una URL; si no está disponible, puedes descargarlo, adjuntarlo manualmente en WhatsApp y abrir la conversación con el texto preparado.
+Descarga el QR en PNG, SVG, JPG o PDF y define el nombre base del archivo; la extensión se agrega según el formato. En los PDF, el QR de tipo URL también funciona como enlace clicable al destino. Comparte el PNG con el menú del dispositivo y un texto que incluya el enlace cuando el QR sea una URL; si no está disponible, puedes descargarlo, adjuntarlo manualmente en WhatsApp y abrir la conversación con el texto preparado. La interfaz está disponible en español e inglés, y guarda la preferencia del usuario en el navegador.
 
 ## Desarrollo
 

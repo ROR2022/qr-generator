@@ -1,18 +1,18 @@
 import type QRCodeStyling from 'qr-code-styling'
+import { getTranslations, type Language } from './i18n'
 import type { QRConfig } from './qr-config'
 import { getDownloadFileName } from './download-name'
 import { getHttpUrl } from './payload'
 
 const shareTitle = 'QR Studio'
-const genericShareText = 'Escanea este código QR para ver el contenido.'
-
-export function getShareText(config: QRConfig) {
+export function getShareText(config: QRConfig, language: Language) {
+  const t = getTranslations(language)
   const url = getHttpUrl(config)
-  return url ? `Escanea este QR o abre el enlace: ${url}` : genericShareText
+  return url ? t.share.url(url) : t.share.generic
 }
 
-export function getWhatsAppShareUrl(config: QRConfig) {
-  return `https://wa.me/?text=${encodeURIComponent(getShareText(config))}`
+export function getWhatsAppShareUrl(config: QRConfig, language: Language) {
+  return `https://wa.me/?text=${encodeURIComponent(getShareText(config, language))}`
 }
 
 async function createQrFile(qr: QRCodeStyling, fileName: string) {
@@ -24,7 +24,7 @@ async function createQrFile(qr: QRCodeStyling, fileName: string) {
   return new File([image], getDownloadFileName(fileName, 'png'), { type: 'image/png' })
 }
 
-export async function shareQr(qr: QRCodeStyling, config: QRConfig, fileName: string) {
+export async function shareQr(qr: QRCodeStyling, config: QRConfig, fileName: string, language: Language) {
   if (typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function') {
     return 'fallback' as const
   }
@@ -35,7 +35,7 @@ export async function shareQr(qr: QRCodeStyling, config: QRConfig, fileName: str
   await navigator.share({
     files: [file],
     title: shareTitle,
-    text: getShareText(config),
+    text: getShareText(config, language),
   })
 
   return 'shared' as const
